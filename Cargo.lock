@@ -274,6 +274,10 @@ dependencies = [
 [[package]]
 name = "raytracing-in-one-weekend"
 version = "0.1.0"
+dependencies = [
+ "image 0.23.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vec3 0.1.0",
+]
 
 [[package]]
 name = "scoped_threadpool"
@@ -294,6 +298,10 @@ dependencies = [
  "lzw 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "miniz_oxide 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "vec3"
+version = "0.1.0"
 
 [metadata]
 "checksum adler32 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "567b077b825e468cc974f0020d4082ee6e03132512f207ef1a02fd5d00d1f32d"
