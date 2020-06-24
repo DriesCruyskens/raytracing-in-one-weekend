@@ -10,7 +10,7 @@ fn main() -> io::Result<()> {
 
     // from height -1 up to and including 0
     for j in (0..IMAGE_HEIGHT).rev() {
-        // Writing progress to stdout (using \r to write over previous line so it stays put).
+        // Writing progress to stdout (using \r to write over same output line).
         io::stdout().write(format!("\rOn scanline: {}", j).as_bytes())?;
         io::stdout().flush()?;
 
@@ -31,7 +31,8 @@ fn main() -> io::Result<()> {
     let path = Path::new("./first-image.png");
     img.save(path).expect("Error saving file");
 
-    io::stdout().write(b"\nDone!\n")?;
+    // using .as_bytes() and not b".." because special unicode characters are highlighted this way.
+    io::stdout().write("\nDone!\n".as_bytes())?;
 
     Ok(())
 }
