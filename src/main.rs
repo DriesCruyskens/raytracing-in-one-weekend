@@ -1,17 +1,29 @@
 use image::{Rgb, RgbImage};
+use ray::Ray;
 use std::io::{self, Write};
 use std::path::Path;
 use vec3::Vec3;
-use ray::Ray;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 384;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 
+fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> bool {
+    let oc = r.origin - center;
+    let a = r.direction.dot(r.direction);
+    let b = 2.0 * oc.dot(r.direction);
+    let c = oc.dot(oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    discriminant > 0.0
+}
+
 fn ray_color(r: &Ray) -> Vec3 {
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
+        return Vec3::new(1.0, 0.0, 0.0);
+    };
     let unit_direction: Vec3 = r.direction.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
-    Vec3::new(1.0, 1.0, 1.0) * (1.0-t) + Vec3::new(0.5, 0.7, 1.0) * t
+    Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
 }
 
 fn main() -> io::Result<()> {
@@ -24,24 +36,27 @@ fn main() -> io::Result<()> {
     let origin = Vec3::new(0.0, 0.0, 0.0);
     let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
+    let lower_left_corner =
+        origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
     // from height-1 up to and including 0
-    for j in (0..=IMAGE_HEIGHT-1).rev() {
+    for j in (0..=IMAGE_HEIGHT - 1).rev() {
         // Writing progress to stdout (using \r to write over same output line).
         io::stdout().write(format!("\rOn scanline: {}", j).as_bytes())?;
         io::stdout().flush()?;
 
         // from 0 up to and excluding IMAGE_WIDTH
         for i in 0..IMAGE_WIDTH {
-            let u = i as f64 / (IMAGE_WIDTH-1) as f64;
-            let v = j as f64 / (IMAGE_HEIGHT-1) as f64;
+            let u = i as f64 / (IMAGE_WIDTH - 1) as f64;
+            let v = j as f64 / (IMAGE_HEIGHT - 1) as f64;
 
-            let r = Ray::new(origin, lower_left_corner + horizontal*u + vertical*v - origin);
+            let r = Ray::new(
+                origin,
+                lower_left_corner + horizontal * u + vertical * v - origin,
+            );
             let color = ray_color(&r);
 
             img.put_pixel(i, j, Rgb(color.to_rgb_array()));
-            
         }
     }
 
