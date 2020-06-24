@@ -283,6 +283,7 @@ name = "raytracing-in-one-weekend"
 version = "0.1.0"
 dependencies = [
  "image 0.23.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ray 0.1.0",
  "vec3 0.1.0",
 ]
 

@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 vec3 = { path = "vec3" }
+ray = { path = "ray" }
 image = "0.23.6"
 
 [workspace]
