@@ -10,6 +10,7 @@ fn main() -> io::Result<()> {
 
     // from height -1 up to and including 0
     for j in (0..IMAGE_HEIGHT).rev() {
+        // Writing progress to stdout (using \r to write over previous line so it stays put).
         io::stdout().write(format!("\rOn scanline: {}", j).as_bytes())?;
         io::stdout().flush()?;
 
