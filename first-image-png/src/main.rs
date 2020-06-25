@@ -9,16 +9,16 @@ fn main() -> io::Result<()> {
     let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
 
     // from height -1 up to and including 0
-    for j in (0..IMAGE_HEIGHT).rev() {
+    for j in (0..=IMAGE_HEIGHT-1).rev() {
         // Writing progress to stdout (using \r to write over same output line).
         io::stdout().write(format!("\rOn scanline: {}", j).as_bytes())?;
         io::stdout().flush()?;
 
         // from 0 up to and excluding IMAGE_WIDTH
         for i in 0..IMAGE_WIDTH {
-            let r: f32 = i as f32 / (IMAGE_WIDTH - 1) as f32;
-            let g: f32 = j as f32 / (IMAGE_HEIGHT - 1) as f32;
-            let b: f32 = 0.25;
+            let r: f64 = i as f64 / (IMAGE_WIDTH - 1) as f64;
+            let g: f64 = j as f64 / (IMAGE_HEIGHT - 1) as f64;
+            let b: f64 = 0.25;
 
             let ir: u8 = (r * 255.0) as u8;
             let ig: u8 = (g * 255.0) as u8;
