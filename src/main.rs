@@ -2,7 +2,7 @@ use image::{RgbImage};
 use ray::Ray;
 use std::io::{self, Write};
 use std::path::Path;
-use vec3::Vec3;
+use vec3::{Vec3, Point3, Color};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 1280;
@@ -10,8 +10,8 @@ const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT  * 3) as usize;
 
-fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> f64 {
-    let oc: Vec3 = r.origin - center;
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
+    let oc: Vec3 = r.origin - *center;
     let a: f64 = r.direction.length_squared();
     let half_b: f64 = oc.dot(r.direction);
     let c: f64 = oc.length_squared() - radius * radius;
@@ -24,15 +24,16 @@ fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> f64 {
 }
 
 fn ray_color(r: &Ray) -> Vec3 {
-    let t = hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r);
+    let t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, r);
     if t > 0.0 {
+        // Calculating normal.
         let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
-        return Vec3::new(n.x+1.0, n.y+1.0, n.z+1.0) * 0.5
+        return Color::new(n.x+1.0, n.y+1.0, n.z+1.0) * 0.5
     }
 
     let unit_direction: Vec3 = r.direction.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
-    Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+    Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
 fn main() -> io::Result<()> {
@@ -42,7 +43,7 @@ fn main() -> io::Result<()> {
     let viewport_width = ASPECT_RATIO * viewport_height;
     let focal_length = 1.0;
 
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let origin = Point3::new(0.0, 0.0, 0.0);
     let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
@@ -71,6 +72,7 @@ fn main() -> io::Result<()> {
 
     // Saving image
     io::stdout().write("\nSaving image...\n".as_bytes())?;
+
     let path = Path::new("./target/first-image.png");
     let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
     img.unwrap().save(path).expect("Error saving file.");

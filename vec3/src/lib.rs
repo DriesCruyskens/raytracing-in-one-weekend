@@ -166,3 +166,6 @@ impl Default for Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
 }
+
+pub type Color = Vec3;
+pub type Point3 = Vec3;
