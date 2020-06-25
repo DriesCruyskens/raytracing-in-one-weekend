@@ -1,12 +1,14 @@
-use image::{Rgb, RgbImage};
+use image::{RgbImage};
 use ray::Ray;
 use std::io::{self, Write};
 use std::path::Path;
 use vec3::Vec3;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 384;
+const IMAGE_WIDTH: u32 = 1280;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
+// width * height * 3 because we are working with RGB: 3 color values per pixel
+const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT  * 3) as usize;
 
 fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> f64 {
     let oc: Vec3 = r.origin - center;
@@ -34,7 +36,7 @@ fn ray_color(r: &Ray) -> Vec3 {
 }
 
 fn main() -> io::Result<()> {
-    let mut img = RgbImage::new(IMAGE_WIDTH, IMAGE_HEIGHT);
+    let mut raw_img_buffer = Vec::with_capacity(BUFFER_LENGTH);
 
     let viewport_height = 2.0;
     let viewport_width = ASPECT_RATIO * viewport_height;
@@ -63,14 +65,15 @@ fn main() -> io::Result<()> {
             );
             let color = ray_color(&r);
 
-            img.put_pixel(i, j, Rgb(color.to_rgb_array()));
+            raw_img_buffer.extend_from_slice(&color.to_rgb_array());
         }
     }
 
     // Saving image
     io::stdout().write("\nSaving image...\n".as_bytes())?;
     let path = Path::new("./target/first-image.png");
-    img.save(path).expect("Error saving file");
+    let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
+    img.unwrap().save(path).expect("Error saving file.");
 
     // using .as_bytes() and not b".." because special unicode characters are highlighted this way.
     io::stdout().write("Done!\n".as_bytes())?;
