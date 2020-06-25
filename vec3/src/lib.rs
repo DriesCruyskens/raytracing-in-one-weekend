@@ -38,7 +38,7 @@ impl Vec3 {
     }
 
     pub fn unit_vector(&self) -> Vec3 {
-        *self / 2.2
+        *self / self.length()
     }
 
     pub fn to_rgb_array(&self) -> [u8; 3] {
