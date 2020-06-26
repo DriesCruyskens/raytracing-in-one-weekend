@@ -1,22 +1,22 @@
-use image::{RgbImage};
+use image::RgbImage;
 use ray::Ray;
+use std::error::Error;
 use std::io::{self, Write};
 use std::path::Path;
-use vec3::{Vec3, Point3, Color};
-use std::error::Error;
+use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 1280;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
-const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT  * 3) as usize;
+const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 
 fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     let oc: Vec3 = r.origin - *center;
     let a: f64 = r.direction.length_squared();
     let half_b: f64 = oc.dot(r.direction);
     let c: f64 = oc.length_squared() - radius * radius;
-    let discriminant: f64 = half_b*half_b - a*c;
+    let discriminant: f64 = half_b * half_b - a * c;
     if discriminant < 0.0 {
         return -1.0;
     } else {
@@ -29,7 +29,7 @@ fn ray_color(r: &Ray) -> Vec3 {
     if t > 0.0 {
         // Calculating normal.
         let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
-        return Color::new(n.x+1.0, n.y+1.0, n.z+1.0) * 0.5
+        return Color::new(n.x + 1.0, n.y + 1.0, n.z + 1.0) * 0.5;
     }
 
     let unit_direction: Vec3 = r.direction.unit_vector();
@@ -76,7 +76,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let path = Path::new("./target/first-image.png");
     let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
-    img.expect("Error creating png image out of raw pixel data.").save(path).expect("Error saving file.");
+    img.expect("Error creating png image out of raw pixel data.")
+        .save(path)
+        .expect("Error saving file.");
 
     // using .as_bytes() and not b".." because special unicode characters are highlighted this way.
     io::stdout().write("Done!\n".as_bytes())?;
