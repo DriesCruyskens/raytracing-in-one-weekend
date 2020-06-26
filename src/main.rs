@@ -3,6 +3,7 @@ use ray::Ray;
 use std::io::{self, Write};
 use std::path::Path;
 use vec3::{Vec3, Point3, Color};
+use std::error::Error;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 1280;
@@ -36,7 +37,7 @@ fn ray_color(r: &Ray) -> Vec3 {
     Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     let mut raw_img_buffer = Vec::with_capacity(BUFFER_LENGTH);
 
     let viewport_height = 2.0;
