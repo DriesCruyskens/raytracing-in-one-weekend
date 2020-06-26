@@ -76,7 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let path = Path::new("./target/first-image.png");
     let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
-    img.unwrap().save(path).expect("Error saving file.");
+    img.expect("Error creating png image out of raw pixel data.").save(path).expect("Error saving file.");
 
     // using .as_bytes() and not b".." because special unicode characters are highlighted this way.
     io::stdout().write("Done!\n".as_bytes())?;
