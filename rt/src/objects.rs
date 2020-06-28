@@ -1,4 +1,4 @@
-use crate::hittable::*;
+use crate::hit::{HitRecord, Hittable};
 use crate::ray::Ray;
 use vec3::{Point3, Vec3};
 
@@ -18,8 +18,8 @@ impl Hittable for Sphere {
         let oc: Vec3 = r.origin - self.center;
         let a: f64 = r.direction.length_squared();
         let half_b: f64 = oc.dot(r.direction);
-        let c: f64 = oc.length_squared() - self.radius*self.radius;
-        let discriminant: f64 = half_b*half_b - a*c;
+        let c: f64 = oc.length_squared() - self.radius * self.radius;
+        let discriminant: f64 = half_b * half_b - a * c;
 
         if discriminant > 0.0 {
             let root = discriminant.sqrt();

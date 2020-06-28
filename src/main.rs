@@ -1,9 +1,5 @@
 use image::RgbImage;
-use rt::{
-    hittable::Hittable,
-    objects::Sphere,
-    ray::Ray,
-};
+use rt::{hit::Hittable, objects::Sphere, ray::Ray};
 use std::error::Error;
 use std::io::{self, Write};
 use std::path::Path;
@@ -23,7 +19,7 @@ fn ray_color(r: &Ray) -> Vec3 {
         // If hit: draw color depending on normal.
         Some(rec) => {
             return Color::new(rec.normal.x + 1.0, rec.normal.y + 1.0, rec.normal.z + 1.0) * 0.5;
-        },
+        }
         // If no hit: draw gradient blue background.
         None => {
             let unit_direction: Vec3 = r.direction.unit_vector();

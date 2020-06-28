@@ -1,5 +1,5 @@
-use vec3::{Vec3, Point3};
 use crate::ray::Ray;
+use vec3::{Point3, Vec3};
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -12,13 +12,13 @@ pub struct HitRecord {
     pub front_face: bool,
 }
 
-impl HitRecord { 
+impl HitRecord {
     pub fn new(p: Vec3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
         HitRecord {
             p,
             normal,
             t,
-            front_face
+            front_face,
         }
     }
 
@@ -36,5 +36,3 @@ impl Default for HitRecord {
         HitRecord::new(Vec3::default(), Vec3::default(), 0.0, false)
     }
 }
-
-
