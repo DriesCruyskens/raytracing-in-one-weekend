@@ -1,8 +1,8 @@
 use image::RgbImage;
-use ray::{
-    hittable::{HitRecord, Hittable},
-    objects::*,
-    Ray,
+use rt::{
+    hittable::Hittable,
+    objects::Sphere,
+    ray::Ray,
 };
 use std::error::Error;
 use std::io::{self, Write};

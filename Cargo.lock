@@ -249,13 +249,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ray"
-version = "0.1.0"
-dependencies = [
- "vec3 0.1.0",
-]
-
-[[package]]
 name = "rayon"
 version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -283,7 +276,14 @@ name = "raytracing-in-one-weekend"
 version = "0.1.0"
 dependencies = [
  "image 0.23.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "ray 0.1.0",
+ "rt 0.1.0",
+ "vec3 0.1.0",
+]
+
+[[package]]
+name = "rt"
+version = "0.1.0"
+dependencies = [
  "vec3 0.1.0",
 ]
 

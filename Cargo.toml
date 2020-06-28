@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 vec3 = { path = "vec3" }
-ray = { path = "ray" }
+rt = { path = "rt" }
 image = "0.23.6"
 
 [workspace]
@@ -16,5 +16,5 @@ members = [
     "first-image",
     "first-image-png",
     "vec3",
-    "ray",
+    "rt",
 ]
