@@ -1,5 +1,8 @@
 use vec3::{Vec3, Point3};
 
+pub mod objects;
+pub mod hittable;
+
 pub struct Ray {
     pub origin: Point3,
     pub direction: Vec3,
