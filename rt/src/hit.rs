@@ -36,3 +36,50 @@ impl Default for HitRecord {
         HitRecord::new(Vec3::default(), Vec3::default(), 0.0, false)
     }
 }
+
+pub struct HittableList {
+    objects: Vec<Box<dyn Hittable>>,
+}
+
+impl HittableList {
+    pub fn new(objects: Vec<Box<dyn Hittable>>) -> Self {
+        HittableList { objects }
+    }
+
+    pub fn add(&mut self, object: Box<dyn Hittable>) {
+        self.objects.push(object);
+    }
+
+    pub fn clear(&mut self) {
+        self.objects.clear();
+    }
+
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut temp_rec: HitRecord = HitRecord::default();
+        let mut hit_anything: bool = false;
+        let mut closest_so_far = t_max;
+
+        for o in self.objects.iter() {
+            match o.hit(r, t_min, closest_so_far) {
+                Some(v) => {
+                    hit_anything = true;
+                    closest_so_far = v.t;
+                    temp_rec = v;
+                }
+                None => continue,
+            }
+        }
+
+        if hit_anything {
+            return Some(temp_rec);
+        } else {
+            return None;
+        }
+    }
+}
+
+impl Default for HittableList {
+    fn default() -> Self {
+        HittableList::new(Vec::new())
+    }
+}

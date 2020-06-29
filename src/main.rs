@@ -1,8 +1,11 @@
 use image::RgbImage;
-use rt::{hit::Hittable, objects::Sphere, ray::Ray};
-use std::error::Error;
-use std::io::{self, Write};
-use std::path::Path;
+use rt::{hit::HittableList, objects::Sphere, ray::Ray};
+use std::{
+    error::Error,
+    f64::INFINITY,
+    io::{self, Write},
+    path::Path,
+};
 use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -11,19 +14,14 @@ const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 
-fn ray_color(r: &Ray) -> Vec3 {
-    let sphere = Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5);
-    let rec = sphere.hit(r, 0.0, 100.0);
-
-    match rec {
-        // If hit: draw color depending on normal.
-        Some(rec) => {
-            return Color::new(rec.normal.x + 1.0, rec.normal.y + 1.0, rec.normal.z + 1.0) * 0.5;
+fn ray_color(r: &Ray, world: &HittableList) -> Vec3 {
+    match world.hit(r, 0.0, INFINITY) {
+        Some(v) => {
+            return (v.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
         }
-        // If no hit: draw gradient blue background.
         None => {
-            let unit_direction: Vec3 = r.direction.unit_vector();
-            let t = 0.5 * (unit_direction.y + 1.0);
+            let unit_direction = r.direction.unit_vector();
+            let t = (unit_direction.y + 1.0) * 0.5;
             return Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t;
         }
     }
@@ -42,6 +40,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let lower_left_corner =
         origin - horizontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
+    let mut world = HittableList::default();
+    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+
     // from height-1 up to and including 0
     for j in (0..=IMAGE_HEIGHT - 1).rev() {
         // Writing progress to stdout (using \r to write over same output line).
@@ -57,7 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 origin,
                 lower_left_corner + horizontal * u + vertical * v - origin,
             );
-            let color = ray_color(&r);
+            let color = ray_color(&r, &world);
 
             raw_img_buffer.extend_from_slice(&color.to_rgb_array());
         }
