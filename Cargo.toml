@@ -10,6 +10,7 @@ edition = "2018"
 vec3 = { path = "vec3" }
 rt = { path = "rt" }
 image = "0.23.6"
+rand = "0.7.3"
 
 [workspace]
 members = [

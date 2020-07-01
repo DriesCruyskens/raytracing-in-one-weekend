@@ -1,6 +1,7 @@
 // TODO write tests
 // TODO write docs
 
+use num;
 use std::ops;
 
 // TODO implement operation traits on reference to Vec3
@@ -43,10 +44,15 @@ impl Vec3 {
 }
 
 impl Color {
-    pub fn to_rgb_array(&self) -> [u8; 3] {
-        let r: u8 = (self.x * 255.0) as u8;
-        let g: u8 = (self.y * 255.0) as u8;
-        let b: u8 = (self.z * 255.0) as u8;
+    pub fn to_rgb_array(&self, samples_per_pixel: i32) -> [u8; 3] {
+        let scale = 1.0 / samples_per_pixel as f64;
+        let r = self.x * scale;
+        let g = self.y * scale;
+        let b = self.z * scale;
+
+        let r: u8 = (num::clamp(r, 0.0, 0.999) * 256.0) as u8;
+        let g: u8 = (num::clamp(g, 0.0, 0.999) * 256.0) as u8;
+        let b: u8 = (num::clamp(b, 0.0, 0.999) * 256.0) as u8;
         [r, g, b]
     }
 }
