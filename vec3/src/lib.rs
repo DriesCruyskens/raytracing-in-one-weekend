@@ -40,7 +40,9 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.length()
     }
+}
 
+impl Color {
     pub fn to_rgb_array(&self) -> [u8; 3] {
         let r: u8 = (self.x * 255.0) as u8;
         let g: u8 = (self.y * 255.0) as u8;
