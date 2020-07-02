@@ -2,6 +2,7 @@
 // TODO write docs
 
 use num;
+use rand::Rng;
 use std::ops;
 
 // TODO implement operation traits on reference to Vec3
@@ -41,14 +42,36 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Vec3 {
         *self / self.length()
     }
+
+    pub fn random() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3::new(rng.gen(), rng.gen(), rng.gen())
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        Vec3::new(
+            rng.gen_range(min, max),
+            rng.gen_range(min, max),
+            rng.gen_range(min, max),
+        )
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random_range(-1.0, 1.0);
+            if p.length_squared() >= 1.0 {continue};
+            return p;
+        };
+    }
 }
 
 impl Color {
     pub fn to_rgb_array(&self, samples_per_pixel: i32) -> [u8; 3] {
         let scale = 1.0 / samples_per_pixel as f64;
-        let r = self.x * scale;
-        let g = self.y * scale;
-        let b = self.z * scale;
+        let r = (self.x * scale).sqrt();
+        let g = (self.y * scale).sqrt();
+        let b = (self.z * scale).sqrt();
 
         let r: u8 = (num::clamp(r, 0.0, 0.999) * 256.0) as u8;
         let g: u8 = (num::clamp(g, 0.0, 0.999) * 256.0) as u8;

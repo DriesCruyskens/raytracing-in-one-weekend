@@ -397,6 +397,7 @@ name = "vec3"
 version = "0.1.0"
 dependencies = [
  "num 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

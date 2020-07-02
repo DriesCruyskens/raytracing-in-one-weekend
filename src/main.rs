@@ -7,19 +7,25 @@ use std::{
     io::{self, Write},
     path::Path,
 };
-use vec3::{Color, Point3};
+use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 1280;
+const IMAGE_WIDTH: u32 = 500;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 const SAMPLES_PER_PIXEL: i32 = 100;
+const MAX_DEPTH: i32 = 50;
 
-fn ray_color(r: &Ray, world: &HittableList) -> Color {
+fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
+    if depth <= 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
     match world.hit(r, 0.0, INFINITY) {
         Some(v) => {
-            return (v.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
+            let target: Point3 = v.p + v.normal + Vec3::random_in_unit_sphere();
+            return ray_color(&Ray::new(v.p, target - v.p), world, depth-1) * 0.5;
         }
         None => {
             let unit_direction = r.direction.unit_vector();
@@ -55,7 +61,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let u = (i as f64 + rng.gen::<f32>() as f64) / (IMAGE_WIDTH - 1) as f64;
                 let v = (j as f64 + rng.gen::<f32>() as f64) / (IMAGE_HEIGHT - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world);
+                pixel_color += ray_color(&r, &world, MAX_DEPTH);
             }
 
             raw_img_buffer.extend_from_slice(&pixel_color.to_rgb_array(SAMPLES_PER_PIXEL));
