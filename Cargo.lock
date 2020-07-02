@@ -369,6 +369,7 @@ dependencies = [
 name = "rt"
 version = "0.1.0"
 dependencies = [
+ "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "vec3 0.1.0",
 ]
 
