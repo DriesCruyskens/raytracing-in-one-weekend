@@ -1,13 +1,20 @@
 use image::RgbImage;
 use rand::Rng;
-use rt::{camera::Camera, hit::HittableList, objects::Sphere, ray::Ray};
+use rt::{
+    camera::Camera,
+    hit::HittableList,
+    material::{Lambertian, Metal},
+    objects::Sphere,
+    ray::Ray,
+};
+use std::rc::Rc;
 use std::{
     error::Error,
     f64::INFINITY,
     io::{self, Write},
     path::Path,
 };
-use vec3::{Color, Point3, Vec3};
+use vec3::{Color, Point3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 500;
@@ -23,9 +30,14 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     match world.hit(r, 0.001, INFINITY) {
-        Some(v) => {
-            let target: Point3 = v.p + v.normal + Vec3::random_in_unit_sphere();
-            return ray_color(&Ray::new(v.p, target - v.p), world, depth-1) * 0.5;
+        Some(rec) => {
+            match rec.mat_ptr.scatter(r, &rec) {
+                Some(scattered_attenuation) => {
+
+                    return scattered_attenuation.1 * ray_color(&scattered_attenuation.0, world, depth - 1);
+                },
+                None => return Color::default(),
+            }
         }
         None => {
             let unit_direction = r.direction.unit_vector();
@@ -42,8 +54,27 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Building world and its objects.
     let mut world = HittableList::default();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+    // floor
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2))),
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8))),
+    )));
 
     let cam = Camera::new();
 
@@ -71,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Saving image
     io::stdout().write("\nSaving image...\n".as_bytes())?;
 
-    let path = Path::new("./target/first-image.png");
+    let path = Path::new("./target/render.png");
     let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
     img.expect("Error creating png image out of raw pixel data.")
         .save(path)

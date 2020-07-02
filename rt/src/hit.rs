@@ -1,5 +1,7 @@
 use crate::ray::Ray;
 use vec3::{Point3, Vec3};
+use crate::material::{Material, Lambertian};
+use std::rc::Rc;
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -10,15 +12,17 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub mat_ptr: Rc<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(p: Vec3, normal: Vec3, t: f64, front_face: bool) -> HitRecord {
+    pub fn new(p: Vec3, normal: Vec3, t: f64, front_face: bool, mat_ptr: Rc<dyn Material>) -> HitRecord {
         HitRecord {
             p,
             normal,
             t,
             front_face,
+            mat_ptr,
         }
     }
 
@@ -33,7 +37,7 @@ impl HitRecord {
 
 impl Default for HitRecord {
     fn default() -> HitRecord {
-        HitRecord::new(Vec3::default(), Vec3::default(), 0.0, false)
+        HitRecord::new(Vec3::default(), Vec3::default(), 0.0, false, Rc::new(Lambertian::default()))
     }
 }
 

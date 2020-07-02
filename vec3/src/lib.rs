@@ -81,6 +81,10 @@ impl Vec3 {
             return -in_unit_sphere;
         }
     }
+
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        return v - n*v.dot(n)*2.0;
+    }
 }
 
 impl Color {

@@ -1,15 +1,18 @@
 use crate::hit::{HitRecord, Hittable};
 use crate::ray::Ray;
 use vec3::{Point3, Vec3};
+use crate::material::{Material, Lambertian};
+use std::rc::Rc;
 
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub mat_ptr: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Sphere {
+        Sphere { center, radius, mat_ptr }
     }
 }
 
@@ -31,6 +34,7 @@ impl Hittable for Sphere {
                 hit_record.p = r.at(hit_record.t);
                 let outward_normal: Vec3 = (hit_record.p - self.center) / self.radius;
                 hit_record.set_face_normal(r, &outward_normal);
+                hit_record.mat_ptr = Rc::clone(&self.mat_ptr);
                 return Some(hit_record);
             }
 
@@ -40,6 +44,7 @@ impl Hittable for Sphere {
                 hit_record.p = r.at(hit_record.t);
                 let outward_normal: Vec3 = (hit_record.p - self.center) / self.radius;
                 hit_record.set_face_normal(r, &outward_normal);
+                hit_record.mat_ptr = Rc::clone(&self.mat_ptr);
                 return Some(hit_record);
             }
         }
@@ -50,6 +55,6 @@ impl Hittable for Sphere {
 
 impl Default for Sphere {
     fn default() -> Self {
-        Sphere::new(Point3::default(), 1.0)
+        Sphere::new(Point3::default(), 1.0, Rc::new(Lambertian::default()))
     }
 }
