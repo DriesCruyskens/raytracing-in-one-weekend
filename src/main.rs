@@ -30,15 +30,13 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     match world.hit(r, 0.001, INFINITY) {
-        Some(rec) => {
-            match rec.mat_ptr.scatter(r, &rec) {
-                Some(scattered_attenuation) => {
-
-                    return scattered_attenuation.1 * ray_color(&scattered_attenuation.0, world, depth - 1);
-                },
-                None => return Color::default(),
+        Some(rec) => match rec.mat_ptr.scatter(r, &rec) {
+            Some(scattered_attenuation) => {
+                return scattered_attenuation.1
+                    * ray_color(&scattered_attenuation.0, world, depth - 1);
             }
-        }
+            None => return Color::default(),
+        },
         None => {
             let unit_direction = r.direction.unit_vector();
             let t = (unit_direction.y + 1.0) * 0.5;

@@ -1,7 +1,6 @@
-use crate::ray::Ray;
 use crate::hit::HitRecord;
+use crate::ray::Ray;
 use vec3::{Color, Vec3};
-
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)>;
@@ -13,16 +12,14 @@ pub struct Lambertian {
 
 impl Lambertian {
     pub fn new(albedo: Color) -> Lambertian {
-        Lambertian {
-            albedo,
-        }
+        Lambertian { albedo }
     }
 }
 
 impl Material for Lambertian {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)> {
         let scatter_direction: Vec3 = rec.normal + Vec3::random_unit_vector();
-        Some((Ray::new(rec.p, scatter_direction),self.albedo.clone()))
+        Some((Ray::new(rec.p, scatter_direction), self.albedo.clone()))
     }
 }
 
@@ -38,9 +35,7 @@ pub struct Metal {
 
 impl Metal {
     pub fn new(albedo: Color) -> Metal {
-        Metal {
-            albedo,
-        }
+        Metal { albedo }
     }
 }
 

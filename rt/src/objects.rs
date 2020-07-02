@@ -1,8 +1,8 @@
 use crate::hit::{HitRecord, Hittable};
+use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
-use vec3::{Point3, Vec3};
-use crate::material::{Material, Lambertian};
 use std::rc::Rc;
+use vec3::{Point3, Vec3};
 
 pub struct Sphere {
     pub center: Point3,
@@ -12,7 +12,11 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Sphere {
-        Sphere { center, radius, mat_ptr }
+        Sphere {
+            center,
+            radius,
+            mat_ptr,
+        }
     }
 }
 
