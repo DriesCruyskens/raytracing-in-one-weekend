@@ -22,7 +22,7 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    match world.hit(r, 0.0, INFINITY) {
+    match world.hit(r, 0.001, INFINITY) {
         Some(v) => {
             let target: Point3 = v.p + v.normal + Vec3::random_in_unit_sphere();
             return ray_color(&Ray::new(v.p, target - v.p), world, depth-1) * 0.5;
