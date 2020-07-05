@@ -79,12 +79,17 @@ fn main() -> Result<(), Box<dyn Error>> {
         Rc::new(Dielectric::new(1.5)),
     )));
 
+    let lookfrom = Point3::new(3.0, 3.0, 3.0);
+    let lookat = Point3::new(0.0, 0.0, -1.0);
+
     let cam = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
+        lookfrom,
+        lookat,
         VUP,
-        30.0,
+        20.0,
         ASPECT_RATIO,
+        2.0,
+        (lookfrom - lookat).length(),
     );
 
     // from height-1 up to and including 0

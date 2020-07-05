@@ -3,7 +3,7 @@
 
 use num;
 use rand::Rng;
-use std::{ops,f64::consts::PI};
+use std::{f64::consts::PI, ops};
 
 // TODO implement operation traits on reference to Vec3
 // Clone and Copy is necessary for operations
@@ -60,17 +60,19 @@ impl Vec3 {
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let p = Vec3::random_range(-1.0, 1.0);
-            if p.length_squared() >= 1.0 {continue};
+            if p.length_squared() >= 1.0 {
+                continue;
+            };
             return p;
-        };
+        }
     }
 
     pub fn random_unit_vector() -> Vec3 {
         let mut rng = rand::thread_rng();
-        let a: f64 = rng.gen_range(0.0, 2.0*PI);
+        let a: f64 = rng.gen_range(0.0, 2.0 * PI);
         let z: f64 = rng.gen_range(-1.0, 1.0);
-        let r = (1.0 - z*z).sqrt();
-        Vec3::new(r*a.cos(), r*a.sin(), z)
+        let r = (1.0 - z * z).sqrt();
+        Vec3::new(r * a.cos(), r * a.sin(), z)
     }
 
     pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
@@ -82,13 +84,25 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let mut p;
+        loop {
+            p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), 0.0);
+            if p.length_squared() >= 1.0 {
+                continue;
+            }
+            return p;
+        }
+    }
+
     pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
-        return v - n*v.dot(n)*2.0;
+        return v - n * v.dot(n) * 2.0;
     }
 
     pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = (-uv).dot(n);
-        let r_out_parallel: Vec3 = (uv + n*cos_theta) * etai_over_etat;
+        let r_out_parallel: Vec3 = (uv + n * cos_theta) * etai_over_etat;
         let r_out_perp = n * -((1.0 - r_out_parallel.length_squared()).sqrt());
         r_out_parallel + r_out_perp
     }
