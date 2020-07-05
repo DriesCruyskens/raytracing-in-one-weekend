@@ -3,7 +3,7 @@ use rand::Rng;
 use rt::{
     camera::Camera,
     hit::HittableList,
-    material::{Lambertian, Metal, Dielectric},
+    material::{Dielectric, Lambertian, Metal},
     objects::Sphere,
     ray::Ray,
 };
@@ -14,7 +14,7 @@ use std::{
     io::{self, Write},
     path::Path,
 };
-use vec3::{Color, Point3};
+use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 500;
@@ -23,6 +23,11 @@ const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 const SAMPLES_PER_PIXEL: i32 = 100;
 const MAX_DEPTH: i32 = 50;
+const VUP: Vec3 = Vec3 {
+    x: 0.0,
+    y: 1.0,
+    z: 0.0,
+};
 
 fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
     if depth <= 0 {
@@ -74,7 +79,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         Rc::new(Dielectric::new(1.5)),
     )));
 
-    let cam = Camera::new();
+    let cam = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        VUP,
+        30.0,
+        ASPECT_RATIO,
+    );
 
     // from height-1 up to and including 0
     for j in (0..=IMAGE_HEIGHT - 1).rev() {
