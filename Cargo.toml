@@ -14,8 +14,6 @@ rand = "0.7.3"
 
 [workspace]
 members = [
-    "first-image",
-    "first-image-png",
     "vec3",
     "rt",
 ]
