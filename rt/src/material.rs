@@ -1,7 +1,7 @@
 use crate::hit::HitRecord;
 use crate::ray::Ray;
-use vec3::{Color, Vec3};
 use rand::Rng;
+use vec3::{Color, Vec3};
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)>;
@@ -67,15 +67,13 @@ pub struct Dielectric {
 
 impl Dielectric {
     pub fn new(ref_idx: f64) -> Dielectric {
-        Dielectric {
-            ref_idx,
-        }
+        Dielectric { ref_idx }
     }
 
     fn schlick(cosine: f64, ref_idx: f64) -> f64 {
-        let r0 = (1.0 - ref_idx) / (1.0 +ref_idx);
+        let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         let r0 = r0 * r0;
-        r0 + (1.0 - r0)*(1.0 - cosine).powi(5)
+        r0 + (1.0 - r0) * (1.0 - cosine).powf(5.0)
     }
 }
 
@@ -90,7 +88,7 @@ impl Material for Dielectric {
 
         let unit_direction = r_in.direction.unit_vector();
         let cos_theta = (-unit_direction).dot(rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta*cos_theta).sqrt();
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         if etai_over_etat * sin_theta > 1.0 {
             let reflected = Vec3::reflect(unit_direction, rec.normal);
