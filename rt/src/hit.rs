@@ -1,6 +1,6 @@
 use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
-use std::rc::Rc;
+use std::sync::Arc;
 use vec3::{Point3, Vec3};
 
 pub trait Hittable {
@@ -12,7 +12,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
-    pub mat_ptr: Rc<dyn Material>,
+    pub mat_ptr: Arc<dyn Material + Send + Sync>,
 }
 
 impl HitRecord {
@@ -21,7 +21,7 @@ impl HitRecord {
         normal: Vec3,
         t: f64,
         front_face: bool,
-        mat_ptr: Rc<dyn Material>,
+        mat_ptr: Arc<dyn Material + Send + Sync>,
     ) -> HitRecord {
         HitRecord {
             p,
@@ -48,21 +48,21 @@ impl Default for HitRecord {
             Vec3::default(),
             0.0,
             false,
-            Rc::new(Lambertian::default()),
+            Arc::new(Lambertian::default()),
         )
     }
 }
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    objects: Vec<Arc<dyn Hittable + Send + Sync>>,
 }
 
 impl HittableList {
-    pub fn new(objects: Vec<Box<dyn Hittable>>) -> Self {
+    pub fn new(objects: Vec<Arc<dyn Hittable + Send + Sync>>) -> Self {
         HittableList { objects }
     }
 
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable + Send + Sync>) {
         self.objects.push(object);
     }
 
