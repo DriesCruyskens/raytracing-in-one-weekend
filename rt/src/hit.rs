@@ -76,13 +76,10 @@ impl HittableList {
         let mut closest_so_far = t_max;
 
         for o in self.objects.iter() {
-            match o.hit(r, t_min, closest_so_far) {
-                Some(v) => {
-                    hit_anything = true;
-                    closest_so_far = v.t;
-                    temp_rec = v;
-                }
-                None => continue,
+            if let Some(v) = o.hit(r, t_min, closest_so_far) {
+                hit_anything = true;
+                closest_so_far = v.t;
+                temp_rec = v;
             }
         }
 

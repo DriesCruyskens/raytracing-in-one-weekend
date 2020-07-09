@@ -105,7 +105,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let path = Path::new("./target/render.png");
     // Taking ownership of T in Arc<Mutex<T>> https://stackoverflow.com/questions/29177449/how-to-take-ownership-of-t-from-arcmutext
-    let raw_img_buffer = Arc::try_unwrap(raw_img_buffer).unwrap().into_inner().unwrap();
+    let raw_img_buffer = Arc::try_unwrap(raw_img_buffer)
+        .unwrap()
+        .into_inner()
+        .unwrap();
     let img = RgbImage::from_raw(IMAGE_WIDTH, IMAGE_HEIGHT, raw_img_buffer);
     img.expect("Error creating png image out of raw pixel data.")
         .save(path)
@@ -122,19 +125,16 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    match world.hit(r, 0.001, INFINITY) {
-        Some(rec) => match rec.mat_ptr.scatter(r, &rec) {
-            Some(scattered_attenuation) => {
-                return scattered_attenuation.1
-                    * ray_color(&scattered_attenuation.0, world, depth - 1);
-            }
-            None => return Color::default(),
-        },
-        None => {
-            let unit_direction = r.direction.unit_vector();
-            let t = (unit_direction.y + 1.0) * 0.5;
-            return Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t;
+    if let Some(rec) = world.hit(r, 0.001, INFINITY) {
+        if let Some(scattered_attenuation) = rec.mat_ptr.scatter(r, &rec) {
+            return scattered_attenuation.1 * ray_color(&scattered_attenuation.0, world, depth - 1);
+        } else {
+            return Color::default();
         }
+    } else {
+        let unit_direction = r.direction.unit_vector();
+        let t = (unit_direction.y + 1.0) * 0.5;
+        return Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t;
     }
 }
 
