@@ -126,8 +126,8 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
     }
 
     if let Some(rec) = world.hit(r, 0.001, INFINITY) {
-        if let Some(scattered_attenuation) = rec.mat_ptr.scatter(r, &rec) {
-            return scattered_attenuation.1 * ray_color(&scattered_attenuation.0, world, depth - 1);
+        if let Some((scattered, attenuation)) = rec.mat_ptr.scatter(r, &rec) {
+            return attenuation * ray_color(&scattered, world, depth - 1);
         } else {
             return Color::default();
         }
