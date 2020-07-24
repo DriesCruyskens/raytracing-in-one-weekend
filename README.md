@@ -4,9 +4,10 @@ A rust workspace implementing a basic raytracer.
 
 Following this book: https://raytracing.github.io/books/RayTracingInOneWeekend.html.
 
-## 4K sample render
+## 4K sample renders
 
-![4k render](/renders/render_4k.png)
+![start 4k render](/renders/render_4k.png)
+![blur 4k render](/renders/blur_4k.png)
 
 ## Extra implementations
 -   multithreading
