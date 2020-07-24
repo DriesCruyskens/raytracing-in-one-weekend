@@ -4,7 +4,7 @@ use rt::{
     camera::Camera,
     hit::HittableList,
     material::{Dielectric, Lambertian, Material, Metal},
-    objects::Sphere,
+    objects::{Sphere, MovingSphere},
     ray::Ray,
 };
 use std::{
@@ -52,6 +52,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         ASPECT_RATIO,
         aperture,
         dist_to_focus,
+        0.0,
+        1.0,
     ));
 
     let mut handles = vec![];
@@ -165,7 +167,8 @@ fn random_scene() -> HittableList {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     sphere_material = Arc::new(Lambertian::new(albedo));
-                    world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
+                    world.add(Arc::new(MovingSphere::new(center, center2, 0.0, 1.0, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random_range(0.5, 1.0);

@@ -3,6 +3,8 @@ use crate::ray::Ray;
 use std::sync::Arc;
 use vec3::{Point3, Vec3};
 
+type MaterialPtr = Arc<dyn Material + Send + Sync>;
+
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
@@ -12,7 +14,7 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
-    pub mat_ptr: Arc<dyn Material + Send + Sync>,
+    pub mat_ptr: MaterialPtr,
 }
 
 impl HitRecord {
@@ -21,7 +23,7 @@ impl HitRecord {
         normal: Vec3,
         t: f64,
         front_face: bool,
-        mat_ptr: Arc<dyn Material + Send + Sync>,
+        mat_ptr: MaterialPtr,
     ) -> HitRecord {
         HitRecord {
             p,
