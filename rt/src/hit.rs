@@ -50,18 +50,18 @@ impl Default for HitRecord {
 }
 
 /// A helper type encapsulating a Hittable into a multithreaded compatible one
-pub type MultithreadedHittable = Arc<dyn Hittable + Send + Sync>;
+pub type HittablePtr = Arc<dyn Hittable + Send + Sync>;
 
 pub struct HittableList {
-    objects: Vec<MultithreadedHittable>,
+    objects: Vec<HittablePtr>,
 }
 
 impl HittableList {
-    pub fn new(objects: Vec<MultithreadedHittable>) -> Self {
+    pub fn new(objects: Vec<HittablePtr>) -> Self {
         HittableList { objects }
     }
 
-    pub fn add(&mut self, object: MultithreadedHittable) {
+    pub fn add(&mut self, object: HittablePtr) {
         self.objects.push(object);
     }
 
