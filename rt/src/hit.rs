@@ -18,13 +18,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    pub fn new(
-        p: Vec3,
-        normal: Vec3,
-        t: f64,
-        front_face: bool,
-        mat_ptr: MaterialPtr,
-    ) -> HitRecord {
+    pub fn new(p: Vec3, normal: Vec3, t: f64, front_face: bool, mat_ptr: MaterialPtr) -> HitRecord {
         HitRecord {
             p,
             normal,

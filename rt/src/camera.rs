@@ -1,6 +1,6 @@
 use crate::ray::Ray;
+use rand::Rng;
 use vec3::{Point3, Vec3};
-use rand::{Rng};
 
 pub struct Camera {
     origin: Point3,
@@ -62,7 +62,7 @@ impl Camera {
         Ray::new(
             self.origin + offset,
             self.lower_left_corner + self.horizontal * s + self.vertical * t - self.origin - offset,
-            rng.gen_range(self.t0, self.t1)
+            rng.gen_range(self.t0, self.t1),
         )
     }
 }
