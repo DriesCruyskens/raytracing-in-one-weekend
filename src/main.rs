@@ -3,10 +3,10 @@ use rand::Rng;
 use rt::{
     camera::Camera,
     hit::HittableList,
-    texture::CheckerPattern,
     material::{Dielectric, Lambertian, Material, Metal},
     objects::{MovingSphere, Sphere},
     ray::Ray,
+    texture::CheckerPattern,
 };
 use std::{
     error::Error,
@@ -144,7 +144,10 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
 fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
-    let checker = Arc::new(CheckerPattern::new_from_colors(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9)));
+    let checker = Arc::new(CheckerPattern::new_from_colors(
+        Color::new(0.2, 0.3, 0.1),
+        Color::new(0.9, 0.9, 0.9),
+    ));
 
     let ground_material = Arc::new(Lambertian::new_from_texture(checker));
     world.add(Arc::new(Sphere::new(
