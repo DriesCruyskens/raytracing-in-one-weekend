@@ -12,6 +12,11 @@ rt = { path = "rt" }
 image = "0.23.6"
 rand = "0.7.3"
 
+[dev-dependencies.cargo-husky]
+version = "1.5.0"
+default-features = true # Disable features which are enabled by default
+features = ["run-for-all", "precommit-hook", "run-cargo-test", "run-cargo-clippy", "run-cargo-check", "run-cargo-fmt"]
+
 [workspace]
 members = [
     "vec3",
