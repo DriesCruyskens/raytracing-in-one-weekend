@@ -7,14 +7,13 @@ pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
     pub u: f64,
-
-    pub v: f64,pub front_face: bool,
+    pub v: f64,
+    pub front_face: bool,
     pub mat_ptr: MaterialPtr,
 }
 
