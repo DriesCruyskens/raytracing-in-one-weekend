@@ -1,35 +1,46 @@
 use crate::hit::HitRecord;
 use crate::ray::Ray;
+use crate::texture::{SolidColor, TexturePtr};
 use rand::Rng;
+use std::sync::Arc;
 use vec3::{Color, Vec3};
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)>;
 }
 
+pub type MaterialPtr = Arc<dyn Material + Send + Sync>;
+
 pub struct Lambertian {
-    albedo: Color,
+    albedo: TexturePtr,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Lambertian {
+    pub fn new_from_color(albedo: &Color) -> Lambertian {
+        Lambertian {
+            albedo: Arc::new(SolidColor::new_from_color(*albedo)),
+        }
+    }
+
+    pub fn new_from_texture(albedo: TexturePtr) -> Lambertian {
         Lambertian { albedo }
     }
 }
 
 impl Material for Lambertian {
+    /// Returns (scattered ray, attenuation).
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)> {
         let scatter_direction: Vec3 = rec.normal + Vec3::random_unit_vector();
         Some((
             Ray::new(rec.p, scatter_direction, r_in.time),
-            self.albedo.clone(),
+            self.albedo.value(rec.u, rec.v, &rec.p),
         ))
     }
 }
 
 impl Default for Lambertian {
     fn default() -> Lambertian {
-        Lambertian::new(Color::default())
+        Lambertian::new_from_color(&Color::default())
     }
 }
 

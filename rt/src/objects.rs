@@ -1,6 +1,7 @@
 use crate::hit::{HitRecord, Hittable};
 use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
+use std::f64::consts::PI;
 use std::sync::Arc;
 use vec3::{Point3, Vec3};
 
@@ -19,6 +20,13 @@ impl Sphere {
             radius,
             mat_ptr,
         }
+    }
+
+    /// Returns the u,v coordinates for a given point as a tuple (u,v).
+    pub fn get_sphere_uv(&self, p: &Vec3) -> (f64, f64) {
+        let phi = p.z.atan2(p.x);
+        let theta = p.y.asin();
+        (1.0 - (phi + PI) / (2.0 * PI), (theta + PI / 2.0) / PI)
     }
 }
 
@@ -41,6 +49,9 @@ impl Hittable for Sphere {
                 let outward_normal: Vec3 = (hit_record.p - self.center) / self.radius;
                 hit_record.set_face_normal(r, &outward_normal);
                 hit_record.mat_ptr = Arc::clone(&self.mat_ptr);
+                let (u, v) = self.get_sphere_uv(&((hit_record.p - self.center) / self.radius));
+                hit_record.u = u;
+                hit_record.v = v;
                 return Some(hit_record);
             }
 
@@ -51,6 +62,9 @@ impl Hittable for Sphere {
                 let outward_normal: Vec3 = (hit_record.p - self.center) / self.radius;
                 hit_record.set_face_normal(r, &outward_normal);
                 hit_record.mat_ptr = Arc::clone(&self.mat_ptr);
+                let (u, v) = self.get_sphere_uv(&((hit_record.p - self.center) / self.radius));
+                hit_record.u = u;
+                hit_record.v = v;
                 return Some(hit_record);
             }
         }

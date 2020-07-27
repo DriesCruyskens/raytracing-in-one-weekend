@@ -1,9 +1,7 @@
-use crate::material::{Lambertian, Material};
+use crate::material::{Lambertian, MaterialPtr};
 use crate::ray::Ray;
 use std::sync::Arc;
 use vec3::{Point3, Vec3};
-
-type MaterialPtr = Arc<dyn Material + Send + Sync>;
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -13,16 +11,20 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub front_face: bool,
     pub mat_ptr: MaterialPtr,
 }
 
 impl HitRecord {
-    pub fn new(p: Vec3, normal: Vec3, t: f64, front_face: bool, mat_ptr: MaterialPtr) -> HitRecord {
+    pub fn new(p: Vec3, normal: Vec3, t: f64, u: f64, v:f64,  front_face: bool, mat_ptr: MaterialPtr) -> HitRecord {
         HitRecord {
             p,
             normal,
             t,
+            u, 
+            v,
             front_face,
             mat_ptr,
         }
@@ -42,6 +44,8 @@ impl Default for HitRecord {
         HitRecord::new(
             Vec3::default(),
             Vec3::default(),
+            0.0,
+            0.0,
             0.0,
             false,
             Arc::new(Lambertian::default()),

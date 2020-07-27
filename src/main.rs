@@ -3,6 +3,7 @@ use rand::Rng;
 use rt::{
     camera::Camera,
     hit::HittableList,
+    texture::CheckerPattern,
     material::{Dielectric, Lambertian, Material, Metal},
     objects::{MovingSphere, Sphere},
     ray::Ray,
@@ -143,7 +144,9 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
 fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
-    let ground_material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let checker = Arc::new(CheckerPattern::new_from_colors(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9)));
+
+    let ground_material = Arc::new(Lambertian::new_from_texture(checker));
     world.add(Arc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -166,7 +169,7 @@ fn random_scene() -> HittableList {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    sphere_material = Arc::new(Lambertian::new(albedo));
+                    sphere_material = Arc::new(Lambertian::new_from_color(&albedo));
                     let center2 = center + Vec3::new(0.0, rng.gen_range(0.0, 0.5), 0.0);
                     world.add(Arc::new(MovingSphere::new(
                         center,
@@ -198,7 +201,7 @@ fn random_scene() -> HittableList {
         material1,
     )));
 
-    let material2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let material2 = Arc::new(Lambertian::new_from_color(&Color::new(0.4, 0.2, 0.1)));
     world.add(Arc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         1.0,
