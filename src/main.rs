@@ -6,7 +6,7 @@ use rt::{
     material::{Dielectric, Lambertian, Material, Metal},
     objects::{MovingSphere, Sphere},
     ray::Ray,
-    texture::CheckerPattern,
+    texture::{CheckerPattern, TexturePtr},
 };
 use std::{
     error::Error,
@@ -38,12 +38,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let raw_img_buffer = Arc::new(Mutex::new(raw_img_buffer));
 
     // Building world and its objects.
-    let world = Arc::new(random_scene());
+    let world = Arc::new(two_spheres_scene());
 
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
     let dist_to_focus = 10.0;
-    let aperture = 0.1;
+    let aperture = 0.0;
 
     let cam = Arc::new(Camera::new(
         lookfrom,
@@ -141,7 +141,7 @@ fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
     }
 }
 
-fn random_scene() -> HittableList {
+fn _random_scene() -> HittableList {
     let mut world = HittableList::default();
 
     let checker = Arc::new(CheckerPattern::new_from_colors(
@@ -219,4 +219,18 @@ fn random_scene() -> HittableList {
     )));
 
     world
+}
+
+fn two_spheres_scene() -> HittableList {
+    let mut objects = HittableList::default();
+
+    let checker: TexturePtr = Arc::new(CheckerPattern::new_from_colors(
+        Color::new(0.2, 0.3, 0.1),
+        Color::new(0.9, 0.9, 0.9),
+    ));
+
+    objects.add(Arc::new(Sphere::new(Point3::new(0.0, -10.0, 0.0), 10.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&checker))))));
+    objects.add(Arc::new(Sphere::new(Point3::new(0.0, 10.0, 0.0), 10.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&checker))))));
+
+    objects
 }
