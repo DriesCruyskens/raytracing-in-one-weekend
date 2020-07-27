@@ -6,7 +6,7 @@ use rt::{
     material::{Dielectric, Lambertian, Material, Metal},
     objects::{MovingSphere, Sphere},
     ray::Ray,
-    texture::{CheckerPattern, TexturePtr},
+    texture::{CheckerPattern, TexturePtr, NoiseTexture},
 };
 use std::{
     error::Error,
@@ -19,7 +19,7 @@ use std::{
 use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 400;
+const IMAGE_WIDTH: u32 = 3840;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let raw_img_buffer = Arc::new(Mutex::new(raw_img_buffer));
 
     // Building world and its objects.
-    let world = Arc::new(two_spheres_scene());
+    let world = Arc::new(two_perlin_spheres_scene());
 
     let lookfrom = Point3::new(13.0, 2.0, 3.0);
     let lookat = Point3::new(0.0, 0.0, 0.0);
@@ -231,6 +231,17 @@ fn two_spheres_scene() -> HittableList {
 
     objects.add(Arc::new(Sphere::new(Point3::new(0.0, -10.0, 0.0), 10.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&checker))))));
     objects.add(Arc::new(Sphere::new(Point3::new(0.0, 10.0, 0.0), 10.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&checker))))));
+
+    objects
+}
+
+fn two_perlin_spheres_scene() -> HittableList {
+    let mut objects = HittableList::default();
+
+    let perlin_texture: TexturePtr = Arc::new(NoiseTexture::new());
+
+    objects.add(Arc::new(Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&perlin_texture))))));
+    objects.add(Arc::new(Sphere::new(Point3::new(0.0, 2.0, 0.0), 2.0, Arc::new(Lambertian::new_from_texture(Arc::clone(&perlin_texture))))));
 
     objects
 }
