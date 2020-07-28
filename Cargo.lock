@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "image"
-version = "0.23.6"
+version = "0.23.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bytemuck 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -348,7 +348,7 @@ dependencies = [
 name = "raytracing-in-one-weekend"
 version = "0.1.0"
 dependencies = [
- "image 0.23.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "image 0.23.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rt 0.1.0",
  "vec3 0.1.0",
@@ -358,6 +358,8 @@ dependencies = [
 name = "rt"
 version = "0.1.0"
 dependencies = [
+ "image 0.23.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "vec3 0.1.0",
 ]
@@ -413,7 +415,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum getrandom 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)" = "7abc8dd8451921606d809ba32e95b6111925cd2906060d2dcc29c070220503eb"
 "checksum gif 0.10.3 (registry+https://github.com/rust-lang/crates.io-index)" = "471d90201b3b223f3451cd4ad53e34295f16a1df17b1edf3736d47761c3981af"
 "checksum hermit-abi 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)" = "b9586eedd4ce6b3c498bc3b4dd92fc9f11166aa908a914071953768066c67909"
-"checksum image 0.23.6 (registry+https://github.com/rust-lang/crates.io-index)" = "b5b0553fec6407d63fe2975b794dfb099f3f790bdc958823851af37b26404ab4"
+"checksum image 0.23.8 (registry+https://github.com/rust-lang/crates.io-index)" = "543904170510c1b5fb65140485d84de4a57fddb2ed685481e9020ce3d2c9f64c"
 "checksum jpeg-decoder 0.1.19 (registry+https://github.com/rust-lang/crates.io-index)" = "5b47b4c4e017b01abdc5bcc126d2d1002e5a75bbe3ce73f9f4f311a916363704"
 "checksum lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 "checksum libc 0.2.71 (registry+https://github.com/rust-lang/crates.io-index)" = "9457b06509d27052635f90d6466700c65095fdf75409b3fbdd903e988b886f49"

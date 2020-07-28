@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 vec3 = { path = "../vec3" }
 rand = "0.7.3"
+image = "0.23.8"
+num = "0.3.0"
