@@ -3,10 +3,13 @@ use crate::ray::Ray;
 use crate::texture::{SolidColor, TexturePtr};
 use rand::Rng;
 use std::sync::Arc;
-use vec3::{Color, Vec3};
+use vec3::{Color, Point3, Vec3};
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)>;
+    fn emitted(&self, _u: f64, _v: f64, _p: &Point3) -> Color {
+        Color::default()
+    }
 }
 
 pub type MaterialPtr = Arc<dyn Material + Send + Sync>;
@@ -131,5 +134,31 @@ impl Material for Dielectric {
 impl Default for Dielectric {
     fn default() -> Self {
         Dielectric::new(0.5)
+    }
+}
+
+pub struct DiffuseLight {
+    emit: TexturePtr,
+}
+
+impl DiffuseLight {
+    pub fn new_from_color(c: Color) -> Self {
+        DiffuseLight {
+            emit: Arc::new(SolidColor::new_from_color(c)),
+        }
+    }
+
+    pub fn new_from_texture(a: TexturePtr) -> Self {
+        DiffuseLight { emit: a }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, _r_in: &Ray, _rec: &HitRecord) -> Option<(Ray, Color)> {
+        None
+    }
+
+    fn emitted(&self, u: f64, v: f64, p: &Point3) -> Color {
+        self.emit.value(u, v, p)
     }
 }

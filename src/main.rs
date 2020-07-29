@@ -44,6 +44,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let lookat = Point3::new(0.0, 0.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.0;
+    let background = Color::new(0.70, 0.80, 1.00);
 
     let cam = Arc::new(Camera::new(
         lookfrom,
@@ -81,7 +82,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     let u = (i as f64 + rng.gen::<f64>() as f64) / (IMAGE_WIDTH - 1) as f64;
                     let v = (j as f64 + rng.gen::<f64>() as f64) / (IMAGE_HEIGHT - 1) as f64;
                     let r = cam.get_ray(u, v);
-                    pixel_color += ray_color(&r, &world, MAX_DEPTH);
+                    pixel_color += ray_color(&r, &background, &world, MAX_DEPTH);
                 }
 
                 pixel_row.extend_from_slice(&pixel_color.to_rgb_array(SAMPLES_PER_PIXEL));
@@ -123,21 +124,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn ray_color(r: &Ray, world: &HittableList, depth: i32) -> Color {
+fn ray_color(r: &Ray, background: &Color, world: &HittableList, depth: i32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
 
     if let Some(rec) = world.hit(r, 0.001, INFINITY) {
+        let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
         if let Some((scattered, attenuation)) = rec.mat_ptr.scatter(r, &rec) {
-            return attenuation * ray_color(&scattered, world, depth - 1);
+            return emitted + attenuation * ray_color(&scattered, background, world, depth - 1);
         } else {
-            return Color::default();
+            return emitted;
         }
     } else {
-        let unit_direction = r.direction.unit_vector();
-        let t = (unit_direction.y + 1.0) * 0.5;
-        return Color::new(1.0, 1.0, 1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t;
+        return *background;
     }
 }
 
