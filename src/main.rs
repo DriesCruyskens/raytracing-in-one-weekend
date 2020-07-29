@@ -4,7 +4,7 @@ use rt::{
     camera::Camera,
     hit::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Material, MaterialPtr, Metal},
-    objects::{MovingSphere, Sphere, XyRect},
+    objects::{MovingSphere, Sphere, XyRect, XzRect, YzRect},
     ray::Ray,
     texture::{CheckerPattern, ImageTexture, NoiseTexture, TexturePtr},
 };
@@ -18,13 +18,13 @@ use std::{
 };
 use vec3::{Color, Point3, Vec3};
 
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 3840;
+const ASPECT_RATIO: f64 = 1.0;
+const IMAGE_WIDTH: u32 = 300;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 const BUFFER_WIDTH: usize = (IMAGE_WIDTH * 3) as usize;
-const SAMPLES_PER_PIXEL: i32 = 400;
+const SAMPLES_PER_PIXEL: i32 = 200;
 const MAX_DEPTH: i32 = 50;
 const VUP: Vec3 = Vec3 {
     x: 0.0,
@@ -38,19 +38,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     let raw_img_buffer = Arc::new(Mutex::new(raw_img_buffer));
 
     // Building world and its objects.
-    let world = Arc::new(simple_light());
+    let world = Arc::new(cornell_box());
 
-    let lookfrom = Point3::new(26.0, 3.0, 6.0);
-    let lookat = Point3::new(0.0, 2.0, 0.0);
+    let lookfrom = Point3::new(278.0, 278.0, -800.0);
+    let lookat = Point3::new(278.0, 278.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.0;
     let background = Color::new(0.0, 0.0, 0.0);
+    let fov = 40.0;
 
     let cam = Arc::new(Camera::new(
         lookfrom,
         lookat,
         VUP,
-        20.0,
+        fov,
         ASPECT_RATIO,
         aperture,
         dist_to_focus,
@@ -141,7 +142,67 @@ fn ray_color(r: &Ray, background: &Color, world: &HittableList, depth: i32) -> C
     }
 }
 
-fn simple_light() -> HittableList {
+fn cornell_box() -> HittableList {
+    let mut objects = HittableList::default();
+
+    let red: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.65, 0.05, 0.05)));
+    let white: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.73, 0.73, 0.73)));
+    let green: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.12, 0.45, 0.15)));
+    let light: MaterialPtr = Arc::new(DiffuseLight::new_from_color(Color::new(15.0, 15.0, 15.0)));
+
+    objects.add(Arc::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&green),
+    )));
+    objects.add(Arc::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Arc::clone(&red),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        Arc::clone(&light),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Arc::clone(&white),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&white),
+    )));
+    objects.add(Arc::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&white),
+    )));
+
+    return objects;
+}
+
+fn _simple_light() -> HittableList {
     let mut objects = HittableList::default();
 
     let pertext = Arc::new(NoiseTexture::new(4.0));

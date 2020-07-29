@@ -197,3 +197,101 @@ impl Hittable for XyRect {
         Some(rec)
     }
 }
+
+pub struct XzRect {
+    mp: MaterialPtr,
+    x0: f64,
+    x1: f64,
+    z0: f64,
+    z1: f64,
+    k: f64,
+}
+
+impl XzRect {
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, mp: MaterialPtr) -> Self {
+        XzRect {
+            x0,
+            x1,
+            z0,
+            z1,
+            k,
+            mp,
+        }
+    }
+}
+
+impl Hittable for XzRect {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let t = (self.k - r.origin.y) / r.direction.y;
+        if t < t_min || t > t_max {
+            return None;
+        }
+        let x = r.origin.x + t * r.direction.x;
+        let z = r.origin.z + t * r.direction.z;
+        if x < self.x0 || x > self.x1 || z < self.z0 || z > self.z1 {
+            return None;
+        }
+        let mut rec = HitRecord::new(
+            r.at(t),
+            Vec3::default(),
+            t,
+            (x - self.x0) / (self.x1 - self.x0),
+            (z - self.z0) / (self.z1 - self.z0),
+            true,
+            Arc::clone(&self.mp),
+        );
+        let outward_normal = Vec3::new(0.0, 1.0, 0.0);
+        rec.set_face_normal(r, &outward_normal);
+
+        Some(rec)
+    }
+}
+
+pub struct YzRect {
+    mp: MaterialPtr,
+    y0: f64,
+    y1: f64,
+    z0: f64,
+    z1: f64,
+    k: f64,
+}
+
+impl YzRect {
+    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, mp: MaterialPtr) -> Self {
+        YzRect {
+            y0,
+            y1,
+            z0,
+            z1,
+            k,
+            mp,
+        }
+    }
+}
+
+impl Hittable for YzRect {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let t = (self.k - r.origin.x) / r.direction.x;
+        if t < t_min || t > t_max {
+            return None;
+        }
+        let y = r.origin.y + t * r.direction.y;
+        let z = r.origin.z + t * r.direction.z;
+        if y < self.y0 || y > self.y1 || z < self.z0 || z > self.z1 {
+            return None;
+        }
+        let mut rec = HitRecord::new(
+            r.at(t),
+            Vec3::default(),
+            t,
+            (y - self.y0) / (self.y1 - self.y0),
+            (z - self.z0) / (self.z1 - self.z0),
+            true,
+            Arc::clone(&self.mp),
+        );
+        let outward_normal = Vec3::new(1.0, 0.0, 0.0);
+        rec.set_face_normal(r, &outward_normal);
+
+        Some(rec)
+    }
+}
