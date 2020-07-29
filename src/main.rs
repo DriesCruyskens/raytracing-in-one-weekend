@@ -4,7 +4,7 @@ use rt::{
     camera::Camera,
     hit::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Material, MaterialPtr, Metal},
-    objects::{MovingSphere, Sphere, XyRect, XzRect, YzRect},
+    objects::{Cube, MovingSphere, Sphere, XyRect, XzRect, YzRect},
     ray::Ray,
     texture::{CheckerPattern, ImageTexture, NoiseTexture, TexturePtr},
 };
@@ -196,6 +196,17 @@ fn cornell_box() -> HittableList {
         0.0,
         555.0,
         555.0,
+        Arc::clone(&white),
+    )));
+
+    objects.add(Arc::new(Cube::new(
+        Point3::new(130.0, 0.0, 65.0),
+        Point3::new(295.0, 165.0, 230.0),
+        Arc::clone(&white),
+    )));
+    objects.add(Arc::new(Cube::new(
+        Point3::new(265.0, 0.0, 295.0),
+        Point3::new(430.0, 330.0, 460.0),
         Arc::clone(&white),
     )));
 

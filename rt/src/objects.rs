@@ -1,4 +1,4 @@
-use crate::hit::{HitRecord, Hittable};
+use crate::hit::{HitRecord, Hittable, HittableList};
 use crate::material::{Lambertian, Material};
 use crate::ray::Ray;
 use std::f64::consts::PI;
@@ -293,5 +293,79 @@ impl Hittable for YzRect {
         rec.set_face_normal(r, &outward_normal);
 
         Some(rec)
+    }
+}
+
+pub struct Cube {
+    _cube_min: Point3,
+    _cube_max: Point3,
+    sides: HittableList,
+}
+
+impl Cube {
+    pub fn new(p0: Point3, p1: Point3, mat: MaterialPtr) -> Self {
+        let mut cube = Cube {
+            _cube_min: p0,
+            _cube_max: p1,
+            sides: HittableList::default(),
+        };
+
+        cube.sides.add(Arc::new(XyRect::new(
+            p0.x,
+            p1.x,
+            p0.y,
+            p1.y,
+            p1.z,
+            Arc::clone(&mat),
+        )));
+        cube.sides.add(Arc::new(XyRect::new(
+            p0.x,
+            p1.x,
+            p0.y,
+            p1.y,
+            p0.z,
+            Arc::clone(&mat),
+        )));
+
+        cube.sides.add(Arc::new(XzRect::new(
+            p0.x,
+            p1.x,
+            p0.z,
+            p1.z,
+            p1.y,
+            Arc::clone(&mat),
+        )));
+        cube.sides.add(Arc::new(XzRect::new(
+            p0.x,
+            p1.x,
+            p0.z,
+            p1.z,
+            p0.y,
+            Arc::clone(&mat),
+        )));
+
+        cube.sides.add(Arc::new(YzRect::new(
+            p0.y,
+            p1.y,
+            p0.z,
+            p1.z,
+            p1.x,
+            Arc::clone(&mat),
+        )));
+        cube.sides.add(Arc::new(YzRect::new(
+            p0.y,
+            p1.y,
+            p0.z,
+            p1.z,
+            p0.x,
+            Arc::clone(&mat),
+        )));
+        cube
+    }
+}
+
+impl Hittable for Cube {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        self.sides.hit(r, t_min, t_max)
     }
 }
