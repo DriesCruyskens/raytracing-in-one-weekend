@@ -3,8 +3,8 @@ use rand::Rng;
 use rt::{
     camera::Camera,
     hit::HittableList,
-    material::{Dielectric, Lambertian, Material, Metal},
-    objects::{MovingSphere, Sphere},
+    material::{Dielectric, DiffuseLight, Lambertian, Material, MaterialPtr, Metal},
+    objects::{MovingSphere, Sphere, XyRect},
     ray::Ray,
     texture::{CheckerPattern, ImageTexture, NoiseTexture, TexturePtr},
 };
@@ -19,12 +19,12 @@ use std::{
 use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 300;
+const IMAGE_WIDTH: u32 = 3840;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
 const BUFFER_WIDTH: usize = (IMAGE_WIDTH * 3) as usize;
-const SAMPLES_PER_PIXEL: i32 = 100;
+const SAMPLES_PER_PIXEL: i32 = 400;
 const MAX_DEPTH: i32 = 50;
 const VUP: Vec3 = Vec3 {
     x: 0.0,
@@ -38,13 +38,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     let raw_img_buffer = Arc::new(Mutex::new(raw_img_buffer));
 
     // Building world and its objects.
-    let world = Arc::new(earth());
+    let world = Arc::new(simple_light());
 
-    let lookfrom = Point3::new(13.0, 2.0, 3.0);
-    let lookat = Point3::new(0.0, 0.0, 0.0);
+    let lookfrom = Point3::new(26.0, 3.0, 6.0);
+    let lookat = Point3::new(0.0, 2.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.0;
-    let background = Color::new(0.70, 0.80, 1.00);
+    let background = Color::new(0.0, 0.0, 0.0);
 
     let cam = Arc::new(Camera::new(
         lookfrom,
@@ -139,6 +139,28 @@ fn ray_color(r: &Ray, background: &Color, world: &HittableList, depth: i32) -> C
     } else {
         return *background;
     }
+}
+
+fn simple_light() -> HittableList {
+    let mut objects = HittableList::default();
+
+    let pertext = Arc::new(NoiseTexture::new(4.0));
+    let material: MaterialPtr = Arc::new(Lambertian::new_from_texture(pertext));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Arc::clone(&material),
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Arc::clone(&material),
+    )));
+
+    let difflight = Arc::new(DiffuseLight::new_from_color(Color::new(4.0, 4.0, 4.0)));
+    objects.add(Arc::new(XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight)));
+
+    objects
 }
 
 fn _random_scene() -> HittableList {
@@ -262,7 +284,7 @@ fn _two_perlin_spheres_scene() -> HittableList {
     objects
 }
 
-fn earth() -> HittableList {
+fn _earth() -> HittableList {
     let earth_texture = Arc::new(ImageTexture::new_from_filename(Path::new(
         "textures/earthmap.jpg",
     )));
