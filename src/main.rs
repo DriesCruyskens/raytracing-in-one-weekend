@@ -4,12 +4,11 @@ use rt::{
     camera::Camera,
     hit::HittableList,
     material::{Dielectric, DiffuseLight, Lambertian, Material, MaterialPtr, Metal},
-    objects::{Cube, MovingSphere, Sphere, XyRect, XzRect, YzRect},
+    objects::{ConstantMedium, Cube, MovingSphere, Sphere, XyRect, XzRect, YzRect},
     ray::Ray,
     texture::{CheckerPattern, ImageTexture, NoiseTexture, TexturePtr},
     transform::{RotateY, Translate},
 };
-
 use std::{
     error::Error,
     f64::INFINITY,
@@ -21,7 +20,7 @@ use std::{
 use vec3::{Color, Point3, Vec3};
 
 const ASPECT_RATIO: f64 = 1.0;
-const IMAGE_WIDTH: u32 = 300;
+const IMAGE_WIDTH: u32 = 3840;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 // width * height * 3 because we are working with RGB: 3 color values per pixel
 const BUFFER_LENGTH: usize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize;
@@ -40,7 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let raw_img_buffer = Arc::new(Mutex::new(raw_img_buffer));
 
     // Building world and its objects.
-    let world = Arc::new(cornell_box());
+    let world = Arc::new(cornell_smoke());
 
     let lookfrom = Point3::new(278.0, 278.0, -800.0);
     let lookat = Point3::new(278.0, 278.0, 0.0);
@@ -144,7 +143,94 @@ fn ray_color(r: &Ray, background: &Color, world: &HittableList, depth: i32) -> C
     }
 }
 
-fn cornell_box() -> HittableList {
+fn cornell_smoke() -> HittableList {
+    let mut objects = HittableList::default();
+
+    let red: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.65, 0.05, 0.05)));
+    let white: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.73, 0.73, 0.73)));
+    let green: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.12, 0.45, 0.15)));
+    let light: MaterialPtr = Arc::new(DiffuseLight::new_from_color(Color::new(15.0, 15.0, 15.0)));
+
+    objects.add(Arc::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&green),
+    )));
+    objects.add(Arc::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Arc::clone(&red),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        Arc::clone(&light),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Arc::clone(&white),
+    )));
+    objects.add(Arc::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&white),
+    )));
+    objects.add(Arc::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Arc::clone(&white),
+    )));
+
+    let cube1 = Arc::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
+        Arc::clone(&white),
+    ));
+    let cube1 = Arc::new(RotateY::new(cube1, 15.0));
+    let cube1 = Arc::new(Translate::new(cube1, Vec3::new(265.0, 0.0, 295.0)));
+
+    let cube2 = Arc::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
+        Arc::clone(&white),
+    ));
+    let cube2 = Arc::new(RotateY::new(cube2, -18.0));
+    let cube2 = Arc::new(Translate::new(cube2, Vec3::new(130.0, 0.0, 65.0)));
+
+    objects.add(Arc::new(ConstantMedium::new_from_color(
+        cube1,
+        0.01,
+        Color::new(0.0, 0.0, 0.0),
+    )));
+    objects.add(Arc::new(ConstantMedium::new_from_color(
+        cube2,
+        0.01,
+        Color::new(1.0, 1.0, 1.0),
+    )));
+
+    return objects;
+}
+
+fn _cornell_box() -> HittableList {
     let mut objects = HittableList::default();
 
     let red: MaterialPtr = Arc::new(Lambertian::new_from_color(&Color::new(0.65, 0.05, 0.05)));

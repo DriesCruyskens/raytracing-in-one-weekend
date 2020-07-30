@@ -1,9 +1,11 @@
-use crate::hit::{HitRecord, Hittable, HittableList};
-use crate::material::{Lambertian, Material};
+use crate::hit::{HitRecord, Hittable, HittableList, HittablePtr};
+use crate::material::{Isotropic, Lambertian, Material};
 use crate::ray::Ray;
-use std::f64::consts::PI;
+use crate::texture::TexturePtr;
+use rand::Rng;
+use std::f64::consts::{E, PI};
 use std::sync::Arc;
-use vec3::{Point3, Vec3};
+use vec3::{Color, Point3, Vec3};
 
 type MaterialPtr = Arc<dyn Material + Send + Sync>;
 
@@ -367,5 +369,72 @@ impl Cube {
 impl Hittable for Cube {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(r, t_min, t_max)
+    }
+}
+
+pub struct ConstantMedium {
+    boundary: HittablePtr,
+    phase_function: MaterialPtr,
+    neg_inv_density: f64,
+}
+
+impl ConstantMedium {
+    pub fn new_from_texture(boundary: HittablePtr, d: f64, a: TexturePtr) -> Self {
+        ConstantMedium {
+            boundary,
+            phase_function: Arc::new(Isotropic::new_from_texture(a)),
+            neg_inv_density: -1.0 / d,
+        }
+    }
+
+    pub fn new_from_color(boundary: HittablePtr, d: f64, c: Color) -> Self {
+        ConstantMedium {
+            boundary,
+            neg_inv_density: -1.0 / d,
+            phase_function: Arc::new(Isotropic::new_from_color(c)),
+        }
+    }
+}
+
+impl Hittable for ConstantMedium {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let mut rng = rand::thread_rng();
+
+        if let Some(mut rec1) = self.boundary.hit(r, f64::NEG_INFINITY, f64::INFINITY) {
+            if let Some(mut rec2) = self.boundary.hit(r, rec1.t + 0.0001, f64::INFINITY) {
+                if rec1.t < t_min {
+                    rec1.t = t_min;
+                }
+                if rec2.t > t_max {
+                    rec2.t = t_max;
+                }
+                if rec1.t > rec2.t {
+                    return None;
+                }
+                if rec1.t < 0.0 {
+                    rec1.t = 0.0;
+                }
+
+                let ray_length = r.direction.length();
+                let distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
+                let hit_distance = self.neg_inv_density * rng.gen::<f64>().log(E);
+
+                if hit_distance > distance_inside_boundary {
+                    return None;
+                }
+
+                let mut rec = HitRecord::default();
+                rec.t = rec1.t + hit_distance / ray_length;
+                rec.p = r.at(rec.t);
+                rec.normal = Vec3::new(1.0, 0.0, 0.0); // Arbitrary
+                rec.front_face = true; // Arbitrary.
+                rec.mat_ptr = Arc::clone(&self.phase_function);
+                return Some(rec);
+            } else {
+                return None;
+            }
+        } else {
+            return None;
+        }
     }
 }
