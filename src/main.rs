@@ -7,7 +7,9 @@ use rt::{
     objects::{Cube, MovingSphere, Sphere, XyRect, XzRect, YzRect},
     ray::Ray,
     texture::{CheckerPattern, ImageTexture, NoiseTexture, TexturePtr},
+    transform::{RotateY, Translate},
 };
+
 use std::{
     error::Error,
     f64::INFINITY,
@@ -199,16 +201,23 @@ fn cornell_box() -> HittableList {
         Arc::clone(&white),
     )));
 
-    objects.add(Arc::new(Cube::new(
-        Point3::new(130.0, 0.0, 65.0),
-        Point3::new(295.0, 165.0, 230.0),
+    let cube1 = Arc::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
         Arc::clone(&white),
-    )));
-    objects.add(Arc::new(Cube::new(
-        Point3::new(265.0, 0.0, 295.0),
-        Point3::new(430.0, 330.0, 460.0),
+    ));
+    let cube1 = Arc::new(RotateY::new(cube1, 15.0));
+    let cube1 = Arc::new(Translate::new(cube1, Vec3::new(265.0, 0.0, 295.0)));
+    objects.add(cube1);
+
+    let cube2 = Arc::new(Cube::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
         Arc::clone(&white),
-    )));
+    ));
+    let cube2 = Arc::new(RotateY::new(cube2, -18.0));
+    let cube2 = Arc::new(Translate::new(cube2, Vec3::new(130.0, 0.0, 65.0)));
+    objects.add(cube2);
 
     return objects;
 }
